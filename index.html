@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2F3E46">
+  <meta name="description" content="Meet Nokma, a friendly nutrition tracker guided by Coach Hoo. Log meals, scan nutrition facts, and keep your small wins going.">
+  <title>Nokma — Feel-good food, one small win at a time</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23f3a65e'/%3E%3Cpath d='M14 51V29c0-4 3-7 7-7s7 3 7 7v22m0-17c0-6 4-10 10-10s10 4 10 10v17' fill='none' stroke='%2321373b' stroke-linecap='round' stroke-linejoin='round' stroke-width='6'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --ink: #2F3E46;
+      --ink-soft: #526E7A;
+      --paper: #FAF6EE;
+      --cream: #F5EBE0;
+      --line: #EEDECB;
+      --orange: #D94A1E;
+      --orange-light: #FFA76C;
+      --gold: #E8A254;
+      --sage: #7CB7A5;
+      --mint: #9BE1C8;
+      --muted: #8FA4AE;
+      --white: #fff;
+      --shadow: 0 24px 60px rgba(32, 47, 43, .15);
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Aptos", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    .wrap { width: min(1180px, calc(100% - 48px)); margin-inline: auto; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 9px; font-size: 11px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+    .eyebrow::before { content: ""; width: 22px; height: 2px; border-radius: 3px; background: currentColor; }
+    .section-title { margin: 16px 0 0; font-size: clamp(38px, 5.2vw, 64px); line-height: .99; letter-spacing: -.055em; font-weight: 800; }
+    .section-copy { max-width: 540px; margin: 19px 0 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+    .topbar { position: absolute; z-index: 5; inset: 0 0 auto; color: #fff7e8; }
+    .topbar-inner { height: 86px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.13); }
+    .brand { display: inline-flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 900; letter-spacing: .12em; }
+    .brand-mark { width: 30px; height: 30px; display: grid; place-items: center; overflow: hidden; border-radius: 10px; background: #f5c47e; }
+    .brand-mark img { width: 100%; height: 100%; object-fit: cover; }
+    .nav-links { display: flex; align-items: center; gap: 34px; color: rgba(255,247,232,.75); font-size: 13px; font-weight: 650; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta { padding: 12px 17px; border: 1px solid rgba(255,247,232,.36); border-radius: 999px; color: #fff7e8; font-size: 12px; font-weight: 750; transition: background .2s ease, color .2s ease; }
+    .nav-cta:hover { background: #fff7e8; color: var(--ink); }
+    .hero { position: relative; overflow: hidden; background: var(--ink); color: #fff8eb; min-height: 735px; }
+    .hero::before, .hero::after { content: ""; position: absolute; pointer-events: none; border-radius: 50%; filter: blur(1px); }
+    .hero::before { width: 650px; height: 650px; right: -140px; top: 35px; background: radial-gradient(circle at 39% 35%, #f4bd72 0, #ef9253 34%, #e35d2a 62%, rgba(227,93,42,0) 72%); opacity: .9; }
+    .hero::after { width: 780px; height: 330px; left: -400px; bottom: -250px; background: #39585a; opacity: .42; }
+    .hero-grid { position: relative; z-index: 1; min-height: 735px; padding-top: 86px; display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: 42px; }
+    .hero-copy { padding: 34px 0 58px; max-width: 590px; }
+    .hero .eyebrow { color: #f5bd69; }
+    .hero h1 { max-width: 620px; margin: 21px 0 0; font-size: clamp(56px, 7.2vw, 88px); line-height: .93; letter-spacing: -.072em; font-weight: 850; }
+    .hero h1 em { color: #f3b96c; font-style: normal; }
+    .hero-lede { max-width: 465px; margin: 24px 0 0; color: rgba(255,248,235,.76); font-size: 18px; line-height: 1.65; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .button { display: inline-flex; justify-content: center; align-items: center; gap: 10px; min-height: 50px; padding: 0 20px; border-radius: 999px; font-size: 13px; font-weight: 800; transition: transform .2s ease, background .2s ease; }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { background: var(--orange); color: white; box-shadow: 0 9px 24px rgba(217,74,30,.25); }
+    .button-primary:hover { background: #eb5629; }
+    .button-quiet { color: #fff8eb; border: 1px solid rgba(255,248,235,.25); }
+    .button-quiet:hover { background: rgba(255,255,255,.08); }
+    .hero-note { display: flex; align-items: center; gap: 10px; margin-top: 36px; color: rgba(255,248,235,.62); font-size: 12px; font-weight: 600; }
+    .note-dot { width: 7px; height: 7px; border-radius: 50%; background: #96c1a9; box-shadow: 0 0 0 5px rgba(150,193,169,.13); }
+    .hero-art { position: relative; min-height: 600px; display: grid; place-items: center; }
+    .sun-disc { position: absolute; width: 440px; height: 440px; right: 36px; top: 81px; border-radius: 50%; background: linear-gradient(140deg, #ffd68b, #ee8550); box-shadow: inset -22px -22px 70px rgba(151,57,24,.15), 0 25px 80px rgba(5,20,23,.25); }
+    .orbit { position: absolute; width: 515px; height: 515px; right: 0; top: 44px; border: 1px solid rgba(255,248,235,.36); border-radius: 50%; transform: rotate(-17deg) scaleY(.55); }
+    .phone { position: relative; z-index: 2; width: 272px; padding: 8px; border: 1px solid rgba(255,255,255,.5); border-radius: 42px; background: #15272b; box-shadow: 0 38px 70px rgba(9,26,28,.42), inset 0 0 0 2px rgba(255,255,255,.12); transform: rotate(4deg) translate(10px, 0); }
+    .phone-screen { min-height: 488px; overflow: hidden; padding: 15px 13px 12px; border-radius: 34px; background: var(--paper); color: var(--ink); }
+    .screen-status { display: flex; justify-content: space-between; margin-bottom: 17px; color: #71858a; font-size: 8px; font-weight: 750; }
+    .screen-greeting { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .screen-greeting small { display: block; color: var(--muted); font-size: 8px; }
+    .screen-greeting strong { display: block; margin-top: 2px; font-size: 15px; letter-spacing: -.04em; }
+    .screen-avatar { width: 29px; height: 29px; overflow: hidden; border-radius: 50%; background: var(--mint); }
+    .screen-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .daily-card { margin-top: 14px; padding: 13px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 6px 15px rgba(47,62,70,.06); }
+    .daily-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--muted); font-size: 8px; font-weight: 700; }
+    .daily-head b { color: var(--ink); font-size: 9px; }
+    .daily-main { display: flex; align-items: center; gap: 13px; margin-top: 10px; }
+    .calorie-ring { width: 66px; height: 66px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(var(--gold) 0 68%, #f2eadc 68% 100%); }
+    .calorie-ring-inner { width: 54px; height: 54px; display: grid; place-content: center; border-radius: 50%; background: #fff; text-align: center; }
+    .calorie-ring-inner b { font-size: 14px; line-height: 1; }
+    .calorie-ring-inner small { margin-top: 3px; color: var(--muted); font-size: 6px; }
+    .daily-numbers b { display: block; color: var(--ink); font-size: 17px; letter-spacing: -.05em; }
+    .daily-numbers small { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; }
+    .macro-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 12px; }
+    .macro-chip { padding: 7px 5px; border-radius: 9px; background: #fff7ef; text-align: center; }
+    .macro-chip:nth-child(2) { background: #effaf5; }
+    .macro-chip:nth-child(3) { background: #eef7f4; }
+    .macro-chip b { display: block; color: var(--orange-light); font-size: 9px; }
+    .macro-chip:nth-child(2) b { color: #6bb99f; }
+    .macro-chip:nth-child(3) b { color: var(--sage); }
+    .macro-chip small { display: block; margin-top: 2px; color: var(--muted); font-size: 7px; }
+    .meals-head { display: flex; align-items: center; justify-content: space-between; margin: 14px 1px 7px; font-size: 9px; font-weight: 800; }
+    .meals-head span { color: var(--orange); font-size: 7px; }
+    .meal-mini { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--line); border-radius: 12px; background: white; }
+    .meal-thumb { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: #fff0df; font-size: 14px; }
+    .meal-mini b { display: block; font-size: 8px; }
+    .meal-mini small { display: block; margin-top: 2px; color: var(--muted); font-size: 7px; }
+    .meal-kcal { margin-left: auto; font-size: 8px; font-weight: 800; }
+    .screen-nav { display: flex; justify-content: space-around; margin: 14px -4px 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--muted); font-size: 7px; }
+    .screen-nav b { color: var(--orange); }
+    .mascot-badge { position: absolute; z-index: 3; right: 16px; top: 164px; width: 124px; height: 124px; overflow: hidden; border: 5px solid #fff8eb; border-radius: 35px; background: #f1a05f; transform: rotate(8deg); box-shadow: 0 15px 34px rgba(35,43,32,.3); }
+    .mascot-badge img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .floating-pill { position: absolute; z-index: 3; left: 0; bottom: 100px; display: flex; align-items: center; gap: 10px; padding: 13px 17px 13px 13px; border: 1px solid rgba(255,255,255,.45); border-radius: 18px; background: rgba(255,253,247,.94); color: var(--ink); box-shadow: 0 12px 30px rgba(28,39,35,.2); transform: rotate(-4deg); }
+    .pill-icon { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--orange); font-size: 14px; }
+    .pill-small { display: block; margin-bottom: 2px; color: #839093; font-size: 9px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .pill-strong { font-size: 14px; font-weight: 850; }
+    .hero-scroll { position: absolute; left: 50%; bottom: 22px; z-index: 2; display: flex; align-items: center; gap: 10px; transform: translateX(-50%); color: rgba(255,248,235,.55); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+    .scroll-line { width: 34px; height: 1px; background: rgba(255,248,235,.5); }
+
+    .intro { padding: 112px 0 106px; }
+    .intro-head { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+    .intro-head .section-copy { max-width: 370px; margin-bottom: 5px; }
+    .intro .eyebrow, .brand-world .eyebrow { color: var(--orange); }
+    .intro .section-title { max-width: 690px; }
+    .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 53px; }
+    .feature-card { position: relative; min-height: 254px; overflow: hidden; padding: 25px; border: 1px solid var(--line); border-radius: 24px; background: var(--white); }
+    .feature-number { display: flex; align-items: center; justify-content: space-between; color: #a0aaa6; font-size: 11px; font-weight: 800; letter-spacing: .12em; }
+    .feature-number span:last-child { display: grid; place-items: center; width: 29px; height: 29px; border-radius: 50%; color: var(--orange); background: #fff0e4; font-size: 14px; letter-spacing: 0; }
+    .feature-card h3 { max-width: 220px; margin: 54px 0 0; font-size: 24px; line-height: 1.1; letter-spacing: -.045em; }
+    .feature-card p { max-width: 290px; margin: 11px 0 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .feature-card::after { content: ""; position: absolute; width: 100px; height: 100px; right: -25px; bottom: -35px; border-radius: 50%; background: #f8e5c9; }
+    .feature-card:nth-child(2)::after { background: #f8d9c4; }
+    .feature-card:nth-child(3)::after { background: #dce8df; }
+    .feature-card:nth-child(4)::after { background: #e8edc9; }
+    .feature-card:nth-child(2) .feature-number span:last-child { color: #bb5d32; background: #fae9dc; }
+    .feature-card:nth-child(3) .feature-number span:last-child { color: #648e80; background: #e8f0e8; }
+
+    .app-showcase { padding: 94px 0 100px; color: #fff7e9; background: #e8dfcd; }
+    .showcase-panel { position: relative; overflow: hidden; display: grid; grid-template-columns: .9fr 1.1fr; min-height: 595px; border-radius: 36px; background: var(--ink); }
+    .showcase-copy { position: relative; z-index: 1; align-self: center; padding: 62px 40px 62px 62px; }
+    .showcase-copy .eyebrow { color: #f2b867; }
+    .showcase-copy h2 { max-width: 425px; margin: 20px 0 0; font-size: clamp(40px, 5vw, 60px); line-height: .99; letter-spacing: -.06em; }
+    .showcase-copy p { max-width: 380px; margin: 20px 0 0; color: rgba(255,247,233,.7); font-size: 15px; line-height: 1.7; }
+    .screen-points { display: grid; gap: 13px; margin: 30px 0 0; padding: 0; list-style: none; color: rgba(255,247,233,.87); font-size: 12px; font-weight: 650; }
+    .screen-points li { display: flex; align-items: center; gap: 10px; }
+    .check { width: 20px; height: 20px; display: grid; place-items: center; border-radius: 50%; color: var(--ink); background: #f2bd6c; font-size: 11px; }
+    .showcase-visual { position: relative; min-height: 560px; overflow: hidden; }
+    .showcase-visual::before { content: ""; position: absolute; width: 500px; height: 500px; top: 50px; right: 30px; border-radius: 50%; background: radial-gradient(circle at 42% 35%, #fad68e, #ef9c5c 62%, #da6239); }
+    .onboard-frame { position: absolute; z-index: 1; top: 43px; left: 50%; width: 259px; padding: 7px; border-radius: 37px; background: #13262b; box-shadow: 0 28px 48px rgba(0,0,0,.35); transform: translateX(-50%) rotate(-5deg); }
+    .scan-screen { min-height: 412px; padding: 22px 15px 16px; border-radius: 31px; background: var(--paper); color: var(--ink); }
+    .scan-top { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 8px; font-weight: 750; }
+    .scan-top span { margin-left: auto; padding: 5px 8px; border-radius: 99px; color: #387e67; background: #e4f4ed; }
+    .scan-frame { height: 142px; display: grid; place-items: center; margin-top: 14px; border: 1.5px dashed #d5b893; border-radius: 18px; background: linear-gradient(145deg,#f8ead5,#fff7e8); }
+    .label-card { width: 112px; padding: 10px; border: 1px solid #d9d0c2; border-radius: 5px; background: #fff; box-shadow: 0 5px 12px rgba(47,62,70,.08); transform: rotate(-5deg); }
+    .label-card strong { display: block; padding-bottom: 5px; border-bottom: 2px solid var(--ink); font-size: 8px; }
+    .label-line { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #eee8de; font-size: 6px; }
+    .scan-result { margin-top: 14px; padding: 12px; border-radius: 14px; background: white; }
+    .scan-result small { color: var(--sage); font-size: 7px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+    .scan-result b { display: block; margin-top: 4px; font-size: 13px; }
+    .scan-result p { margin: 5px 0 0; color: var(--muted); font-size: 8px; }
+    .scan-nutrients { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; margin-top: 10px; }
+    .scan-nutrients span { padding: 7px 3px; border-radius: 7px; background: #fff4eb; color: var(--gold); font-size: 7px; font-weight: 800; text-align: center; }
+    .scan-nutrients span:nth-child(2) { background: #effaf5; color: #6bb99f; }
+    .scan-nutrients span:nth-child(3) { background: #eff7f4; color: var(--sage); }
+    .scan-nutrients span:nth-child(4) { background: #f8f3e8; color: #bd9260; }
+    .scan-button { margin-top: 11px; padding: 9px; border-radius: 99px; color: white; background: var(--orange); font-size: 8px; font-weight: 800; text-align: center; }
+    .sticker { position: absolute; z-index: 2; right: 35px; bottom: 76px; padding: 13px 17px; border: 1px solid rgba(255,255,255,.55); border-radius: 16px; background: #fffaf0; color: var(--ink); box-shadow: 0 10px 26px rgba(10,27,29,.2); transform: rotate(5deg); }
+    .sticker b { display: block; font-size: 13px; }
+    .sticker span { color: var(--muted); font-size: 10px; }
+
+    .brand-world { padding: 112px 0 104px; }
+    .brand-world-head { display: flex; align-items: end; justify-content: space-between; gap: 40px; }
+    .brand-world .section-title { max-width: 650px; }
+    .brand-world-head .section-copy { max-width: 360px; margin-bottom: 4px; }
+    .world-grid { display: grid; grid-template-columns: 1.08fr .92fr; gap: 18px; margin-top: 52px; }
+    .mascot-story { position: relative; min-height: 390px; overflow: hidden; display: flex; align-items: end; padding: 32px; border-radius: 28px; color: #fff7e9; background: linear-gradient(142deg, #dd4d21, #ef8a4a 60%, #f0b764); }
+    .mascot-story::before { content: ""; position: absolute; width: 340px; height: 340px; right: -25px; top: -55px; border: 1px solid rgba(255,255,255,.34); border-radius: 50%; box-shadow: 0 0 0 32px rgba(255,255,255,.06), 0 0 0 68px rgba(255,255,255,.05); }
+    .mascot-story::after { content: ""; position: absolute; width: 220px; height: 220px; right: 40px; top: 32px; border-radius: 50%; background: rgba(255,238,202,.35); }
+    .mascot-cutout { position: absolute; z-index: 1; width: 225px; height: 225px; right: 46px; top: 18px; overflow: hidden; border-radius: 50%; background: #f8d998; box-shadow: 0 14px 35px rgba(107,47,23,.2); }
+    .mascot-cutout img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+    .mascot-text { position: relative; z-index: 2; max-width: 340px; }
+    .mascot-text .eyebrow { color: rgba(255,247,233,.75); }
+    .mascot-text h3 { margin: 11px 0 0; font-size: 34px; line-height: 1; letter-spacing: -.055em; }
+    .mascot-text p { max-width: 300px; margin: 11px 0 0; color: rgba(255,247,233,.84); font-size: 13px; line-height: 1.55; }
+    .brand-kit { padding: 30px; border: 1px solid var(--line); border-radius: 28px; background: var(--white); }
+    .kit-top { display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+    .kit-top .eyebrow { color: #9aa5a0; }
+    .kit-top h3 { margin: 11px 0 0; font-size: 25px; letter-spacing: -.05em; }
+    .kit-spark { color: var(--orange); font-size: 24px; }
+    .swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 28px; }
+    .swatch { min-width: 0; }
+    .swatch-color { height: 70px; border-radius: 12px; }
+    .swatch-name { display: block; margin-top: 8px; overflow: hidden; color: #405358; font-size: 9px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+    .swatch-code { display: block; margin-top: 3px; color: #9aa5a0; font-size: 9px; }
+    .kit-rule { height: 1px; margin: 27px 0 20px; background: var(--line); }
+    .type-sample { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .type-sample strong { font-size: 31px; line-height: .95; letter-spacing: -.06em; }
+    .type-sample span { max-width: 115px; color: var(--muted); font-size: 11px; line-height: 1.4; text-align: right; }
+
+    .voice { padding: 0 0 110px; }
+    .voice-card { position: relative; overflow: hidden; display: grid; grid-template-columns: .85fr 1.15fr; align-items: center; gap: 40px; padding: 49px 56px; border-radius: 28px; background: #f0e8d7; }
+    .voice-card::after { content: "“"; position: absolute; top: -54px; right: 18px; color: rgba(222,75,28,.1); font-family: Georgia, serif; font-size: 280px; line-height: 1; }
+    .voice-label { position: relative; z-index: 1; }
+    .voice-label .eyebrow { color: var(--orange); }
+    .voice-label h2 { max-width: 340px; margin: 15px 0 0; font-size: 39px; line-height: 1; letter-spacing: -.06em; }
+    .voice-list { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .voice-chip { padding: 16px 17px; border: 1px solid rgba(48,74,78,.1); border-radius: 14px; background: rgba(255,253,249,.72); color: #42585a; font-size: 12px; font-weight: 750; }
+    .voice-chip:first-child { color: white; border-color: var(--orange); background: var(--orange); }
+
+    .closing { overflow: hidden; position: relative; padding: 84px 0 26px; color: #fff7e9; background: var(--ink); }
+    .closing::before { content: ""; position: absolute; width: 560px; height: 560px; right: -220px; top: -320px; border-radius: 50%; background: #304f52; }
+    .closing-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 36px; padding-bottom: 75px; }
+    .closing .eyebrow { color: #f2b867; }
+    .closing h2 { max-width: 690px; margin: 17px 0 0; font-size: clamp(42px, 6vw, 68px); line-height: .96; letter-spacing: -.06em; }
+    .closing p { max-width: 430px; margin: 18px 0 0; color: rgba(255,247,233,.68); font-size: 14px; line-height: 1.6; }
+    .closing-action { flex: 0 0 auto; }
+    .footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 0 4px; border-top: 1px solid rgba(255,255,255,.15); color: rgba(255,247,233,.54); font-size: 10px; }
+    .footer-brand { color: #fff7e9; font-weight: 900; letter-spacing: .12em; }
+
+    @media (max-width: 850px) {
+      .wrap { width: min(100% - 36px, 620px); }
+      .topbar-inner { height: 70px; }
+      .nav-links { gap: 18px; }
+      .nav-links a:not(.nav-cta) { display: none; }
+      .hero { min-height: auto; }
+      .hero-grid { min-height: auto; padding-top: 110px; grid-template-columns: 1fr; gap: 0; }
+      .hero-copy { padding: 14px 0 0; }
+      .hero h1 { max-width: 580px; font-size: clamp(58px, 12vw, 82px); }
+      .hero-art { min-height: 540px; margin-top: -6px; }
+      .sun-disc { width: min(430px, 84vw); height: min(430px, 84vw); right: 50%; top: 55px; transform: translateX(50%); }
+      .orbit { width: min(490px, 96vw); height: min(490px, 96vw); right: 50%; top: 30px; transform: translateX(50%) rotate(-17deg) scaleY(.55); }
+      .phone { width: 245px; }
+      .mascot-badge { right: 12px; top: 125px; width: 100px; height: 100px; border-radius: 29px; }
+      .floating-pill { left: 0; bottom: 67px; }
+      .hero-scroll { display: none; }
+      .intro, .brand-world { padding: 78px 0; }
+      .intro-head, .brand-world-head { display: block; }
+      .intro-head .section-copy, .brand-world-head .section-copy { max-width: 470px; margin-top: 17px; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); gap: 11px; margin-top: 34px; }
+      .feature-card { min-height: 206px; padding: 22px; }
+      .feature-card h3 { margin-top: 38px; }
+      .app-showcase { padding: 38px 0 62px; }
+      .showcase-panel { grid-template-columns: 1fr; }
+      .showcase-copy { padding: 38px 28px 5px; }
+      .showcase-visual { min-height: 500px; }
+      .showcase-visual::before { width: 440px; height: 440px; top: 28px; right: 50%; transform: translateX(50%); }
+      .onboard-frame { top: 28px; width: 230px; }
+      .sticker { right: 16px; bottom: 67px; }
+      .world-grid { grid-template-columns: 1fr; margin-top: 34px; }
+      .mascot-story { min-height: 370px; }
+      .mascot-cutout { width: 195px; height: 195px; right: 30px; top: 25px; }
+      .voice { padding-bottom: 72px; }
+      .voice-card { grid-template-columns: 1fr; gap: 25px; padding: 30px 25px; }
+      .closing-inner { display: block; padding-bottom: 52px; }
+      .closing-action { margin-top: 25px; }
+    }
+    @media (max-width: 470px) {
+      .wrap { width: calc(100% - 32px); }
+      .brand { font-size: 16px; }
+      .nav-cta { padding: 10px 13px; font-size: 11px; }
+      .hero h1 { font-size: 57px; }
+      .hero-lede { font-size: 16px; }
+      .hero-art { min-height: 475px; }
+      .phone { width: 215px; border-radius: 35px; }
+      .phone-screen { border-radius: 28px; }
+      .sun-disc { top: 48px; }
+      .orbit { top: 25px; }
+      .mascot-badge { top: 111px; right: 0; width: 86px; height: 86px; border-width: 4px; border-radius: 25px; }
+      .floating-pill { bottom: 49px; padding: 10px 13px 10px 10px; }
+      .pill-icon { width: 30px; height: 30px; }
+      .pill-strong { font-size: 12px; }
+      .section-title { font-size: 42px; }
+      .feature-card h3 { font-size: 22px; }
+      .showcase-panel { border-radius: 25px; }
+      .showcase-copy { padding-inline: 23px; }
+      .showcase-copy h2 { font-size: 43px; }
+      .showcase-visual { min-height: 445px; }
+      .onboard-frame { width: 205px; }
+      .sticker { right: 9px; bottom: 52px; }
+      .mascot-story { min-height: 375px; padding: 24px; }
+      .mascot-cutout { width: 155px; height: 155px; right: 18px; top: 25px; }
+      .mascot-story::after { width: 170px; height: 170px; right: 10px; top: 17px; }
+      .mascot-text h3 { font-size: 30px; }
+      .brand-kit { padding: 24px 19px; }
+      .swatches { gap: 6px; }
+      .swatch-color { height: 52px; }
+      .swatch-name, .swatch-code { font-size: 8px; }
+      .type-sample strong { font-size: 25px; }
+      .voice-list { grid-template-columns: 1fr; }
+      .voice-label h2 { font-size: 34px; }
+      .footer { align-items: start; flex-direction: column; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="wrap topbar-inner" aria-label="Main navigation">
+      <a class="brand" href="#top" aria-label="Nokma home"><span class="brand-mark"><img src="assets/nokma-logo-badge.png" alt=""></span><span>NOKMA</span></a>
+      <div class="nav-links">
+        <a href="#approach">The approach</a>
+        <a href="#brand-world">Brand world</a>
+        <a class="nav-cta" href="https://expo.dev/accounts/josephlopezzzz/projects/coach-hoo/builds/c3b15c7e-98fd-4494-92d5-f19a428eef43" target="_blank" rel="noopener noreferrer">Download Nokma <span aria-hidden="true">↗</span></a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="eyebrow">Nutrition, with a little more heart</span>
+          <h1 id="hero-title">Feel good food.<br><em>One small win</em><br>at a time.</h1>
+          <p class="hero-lede">A feel-good nutrition tracker for everyday eating. Log a meal, check your macros, and let Coach Hoo cheer on the next small win.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="https://expo.dev/accounts/josephlopezzzz/projects/coach-hoo/builds/c3b15c7e-98fd-4494-92d5-f19a428eef43" target="_blank" rel="noopener noreferrer">Download Nokma <span aria-hidden="true">↗</span></a>
+            <a class="button button-quiet" href="#the-app">Explore the app <span aria-hidden="true">↓</span></a>
+            <a class="button button-quiet" href="#brand-world">Meet Coach Hoo</a>
+          </div>
+          <div class="hero-note"><span class="note-dot" aria-hidden="true"></span> Filipino recipes, fast-food favorites, one clear daily view</div>
+        </div>
+        <div class="hero-art" aria-label="Nokma dashboard preview">
+          <div class="sun-disc" aria-hidden="true"></div><div class="orbit" aria-hidden="true"></div>
+          <div class="phone" role="img" aria-label="Sample Nokma dashboard showing daily calories, macros, a Filipino meal entry, and app navigation"><div class="phone-screen">
+            <div class="screen-status"><span>9:41 ◉</span><span>●●●  ▰</span></div>
+            <div class="screen-greeting"><div><small>GOOD MORNING</small><strong>Today is yours.</strong></div><span class="screen-avatar"><img src="assets/nokma-logo-badge.png" alt=""></span></div>
+            <div class="daily-card"><div class="daily-head"><span>DAILY FUEL</span><b>•••</b></div><div class="daily-main"><div class="calorie-ring"><div class="calorie-ring-inner"><b>1,684</b><small>OF 2,200 KCAL</small></div></div><div class="daily-numbers"><b>516</b><small>kcal left today</small></div></div><div class="macro-row"><div class="macro-chip"><b>82g</b><small>PROTEIN</small></div><div class="macro-chip"><b>146g</b><small>CARBS</small></div><div class="macro-chip"><b>51g</b><small>FAT</small></div></div></div>
+            <div class="meals-head">Today’s meals <span>VIEW ALL →</span></div><div class="meal-mini"><span class="meal-thumb">🍲</span><span><b>Chicken tinola</b><small>Lunch · Filipino recipe</small></span><span class="meal-kcal">420 kcal</span></div>
+            <div class="screen-nav"><span>⌂<br>Home</span><b>⌕<br>Search</b><span>▥<br>Progress</span><span>♙<br>Profile</span></div>
+          </div></div>
+          <div class="mascot-badge"><img src="assets/nokma-logo-badge.png" alt="Coach Hoo, Nokma’s chicken mascot"></div>
+          <div class="floating-pill"><span class="pill-icon" aria-hidden="true">✦</span><span><span class="pill-small">Today’s little win</span><span class="pill-strong">You showed up.</span></span></div>
+        </div>
+      </div>
+      <div class="hero-scroll" aria-hidden="true"><span class="scroll-line"></span>Scroll to explore<span class="scroll-line"></span></div>
+    </section>
+
+    <section class="intro" id="approach" aria-labelledby="approach-title">
+      <div class="wrap">
+        <div class="intro-head">
+          <div><span class="eyebrow">A little progress, made visible</span><h2 class="section-title" id="approach-title">Food tracking that<br>fits real life.</h2></div>
+          <p class="section-copy">Nokma brings food logging, nutrition facts, and friendly coaching together, with space for the meals and routines that are yours.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card"><div class="feature-number"><span>01 / FOOD LOG</span><span aria-hidden="true">＋</span></div><h3>Find your kind of food.</h3><p>Explore everyday foods, Filipino recipes, and fast-food entries, then add them to your day.</p></article>
+          <article class="feature-card"><div class="feature-number"><span>02 / SCANNER</span><span aria-hidden="true">⌗</span></div><h3>Scan. Check. Log.</h3><p>Read nutrition facts from a label or menu and review the detected values before logging.</p></article>
+          <article class="feature-card"><div class="feature-number"><span>03 / COACH HOO</span><span aria-hidden="true">✦</span></div><h3>A coach in your corner.</h3><p>Ask about meals, your remaining targets, or what to log next. Keep the tone kind and clear.</p></article>
+          <article class="feature-card"><div class="feature-number"><span>04 / MOMENTUM</span><span aria-hidden="true">↗</span></div><h3>Make progress visible.</h3><p>See your streak calendar, daily patterns, and 7-, 14-, or 30-day nutrition trends.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-showcase" id="the-app" aria-labelledby="app-title">
+      <div class="wrap showcase-panel">
+        <div class="showcase-copy">
+          <span class="eyebrow">One tap from label to log</span>
+          <h2 id="app-title">A clearer look at what’s on your plate.</h2>
+          <p>Scan nutrition facts from a package or menu, review what Nokma reads, and save the values to your food log.</p>
+          <ul class="screen-points">
+            <li><span class="check" aria-hidden="true">✓</span> Review calories, macros, and more</li>
+            <li><span class="check" aria-hidden="true">✓</span> Check extracted values before you use them</li>
+            <li><span class="check" aria-hidden="true">✓</span> Save it straight to your day</li>
+          </ul>
+        </div>
+        <div class="showcase-visual">
+          <div class="onboard-frame" role="img" aria-label="Sample nutrition scan result for oat drink with calories and macro values"><div class="scan-screen">
+            <div class="scan-top"><span>‹</span> Label scan <span>✓ READY</span></div>
+            <div class="scan-frame"><div class="label-card"><strong>NUTRITION FACTS</strong><div class="label-line"><span>Calories</span><b>120 kcal</b></div><div class="label-line"><span>Total Fat</span><b>4 g</b></div><div class="label-line"><span>Carbs</span><b>16 g</b></div><div class="label-line"><span>Protein</span><b>3 g</b></div></div></div>
+            <div class="scan-result"><small>Values detected · review first</small><b>Oat drink</b><p>Per serving · 240 ml</p><div class="scan-nutrients"><span>120 kcal</span><span>3g protein</span><span>16g carbs</span><span>4g fat</span></div></div>
+            <div class="scan-button">Use values</div>
+          </div></div>
+          <div class="sticker"><b>Read from the label.</b><span>Review, then log</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="brand-world" id="brand-world" aria-labelledby="brand-title">
+      <div class="wrap">
+        <div class="brand-world-head">
+          <div><span class="eyebrow">The Nokma brand world</span><h2 class="section-title" id="brand-title">Warm color.<br>Clear choices. Kind coaching.</h2></div>
+          <p class="section-copy">A friendly palette, a confident food coach, and Coach Hoo’s familiar face turn daily nutrition into an experience that feels more human.</p>
+        </div>
+        <div class="world-grid">
+          <article class="mascot-story">
+            <div class="mascot-cutout"><img src="assets/coach-hoo-flex.png" alt=""></div>
+            <div class="mascot-text"><span class="eyebrow">Meet Coach Hoo</span><h3>Your macro-tracking<br>chicken coach.</h3><p>Part nutrition guide, part cheer squad. Coach Hoo helps make the numbers feel a little more approachable.</p></div>
+          </article>
+          <article class="brand-kit" aria-label="Nokma visual identity colors and typography">
+            <div class="kit-top"><div><span class="eyebrow">A warm little toolkit</span><h3>Color with a pulse.</h3></div><span class="kit-spark" aria-hidden="true">✳</span></div>
+            <div class="swatches">
+              <div class="swatch"><div class="swatch-color" style="background:#2F3E46"></div><span class="swatch-name">Dark slate</span><span class="swatch-code">#2F3E46</span></div>
+              <div class="swatch"><div class="swatch-color" style="background:#D94A1E"></div><span class="swatch-name">Nokma orange</span><span class="swatch-code">#D94A1E</span></div>
+              <div class="swatch"><div class="swatch-color" style="background:#E8A254"></div><span class="swatch-name">Calorie gold</span><span class="swatch-code">#E8A254</span></div>
+              <div class="swatch"><div class="swatch-color" style="background:#7CB7A5"></div><span class="swatch-name">Fat teal</span><span class="swatch-code">#7CB7A5</span></div>
+              <div class="swatch"><div class="swatch-color" style="background:#FAF6EE;border:1px solid #EEDECB"></div><span class="swatch-name">Warm cream</span><span class="swatch-code">#FAF6EE</span></div>
+            </div>
+            <div class="kit-rule"></div>
+            <div class="type-sample"><strong>Feel good food.</strong><span>Protein peach · Carbs mint · Fat teal. Clear color cues across the macro view.</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="voice" aria-labelledby="voice-title">
+      <div class="wrap voice-card">
+        <div class="voice-label"><span class="eyebrow">How Coach Hoo sounds</span><h2 id="voice-title">A friendly voice for everyday goals.</h2></div>
+        <div class="voice-list" aria-label="Nokma voice principles"><div class="voice-chip">Warm, never preachy</div><div class="voice-chip">English or Filipino</div><div class="voice-chip">Clear about your numbers</div><div class="voice-chip">Progress at your pace</div></div>
+      </div>
+    </section>
+
+    <section class="closing" aria-labelledby="closing-title">
+      <div class="wrap">
+        <div class="closing-inner">
+          <div><span class="eyebrow">Your next small win</span><h2 id="closing-title">Good food days start one choice at a time.</h2><p>Nokma brings food logging, macro tracking, label scanning, and friendly Coach Hoo chats into one warm daily companion.</p></div>
+          <a class="button button-primary closing-action" href="https://expo.dev/accounts/josephlopezzzz/projects/coach-hoo/builds/c3b15c7e-98fd-4494-92d5-f19a428eef43" target="_blank" rel="noopener noreferrer">Download Nokma <span aria-hidden="true">↗</span></a>
+        </div>
+        <footer class="footer"><span class="footer-brand">NOKMA</span><span>Feel good food. One small win at a time.</span><span>© Nokma</span></footer>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
